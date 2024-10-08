@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 const AdminChatCard = () => {
 
-        const [socket, setSocket] = useState(null);
+        const [socket, setSocket] = useState(undefined);
         const [messages, setMessages] = useState([]);
         const [message, setMessage] = useState("");
         const [socketID, setSocketId] = useState("");
@@ -23,27 +23,16 @@ const AdminChatCard = () => {
         }
 
         useEffect(() => {
-                // const socket = new WebSocket("ws://localhost:8080");
-                // const socket = io(process.env.HOST, { withCredentials: true }, []);
-                // const ENDPOINT = "http://localhost:4000";
-                
-                const socket = io(process.env.HOST, {
-                        transports: ['websocket']
-                });
+                // const socket = useMemo(() => io("http://localhost:4000", { withCredentials: true, }), []);
+                const socket = io(process.env.HOST, { withCredentials: true }, []);
                 setSocket(socket);
 
                 socket.on("connect", () => {
                         setSocketId(socket.id);
-                        console.log("connected", socket.id);
                 });
 
                 socket.on("receive-message", (data) => {
                         setMessages((messages) => [...messages, data]);
-                });
-
-                socket.on("connect_error", async (err) => {
-                        console.log(`connect_error due to ${err.message}`);
-                        setMessages((messages) => [...messages, { name: err.name, message: err.message }]);
                 });
 
                 return () => {
@@ -54,6 +43,7 @@ const AdminChatCard = () => {
 
         return (
                 <div>
+
                         <div className="h-[80vh] overflow-y-auto">
                                 {messages.map((m, i) => (
                                         <div key={i} className="flex gap-3 flex-col border mb-2 rounded-md p-3">
